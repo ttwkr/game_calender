@@ -1,0 +1,43 @@
+service: game-calender
+
+frameworkVersion: '3'
+
+useDotenv: true
+
+plugins:
+  - serverless-deployment-bucket
+  - serverless-dotenv-plugin
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    useDocker: true
+
+provider:
+  name: aws
+  runtime: go1.x
+  region: ap-northeast-2
+  versionFunctions: true
+  logRetentionInDays: 1
+  endpointType: PRIVATE
+  deploymentBucket:
+    name: "ssjproject"
+    serverSideEncryption: AES256
+  environment:
+    NOTION_API_KEY: ${env:NOTION_API_KEY}
+    DATABASE_ID: ${env:DATABASE_ID}
+    URL: ${env:URL}
+
+package:
+  patterns:
+    - '!./**'
+    - ./bin/**
+
+functions:
+  gameCalender:
+    handler: bin/game_calender
+    events:
+      - httpApi:
+          path: /game/calender
+          method: get
+
